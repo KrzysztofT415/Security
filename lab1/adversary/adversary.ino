@@ -1,14 +1,13 @@
 // Adversary duplicates every signal
 
 #include <IRremote.h>
+#include "utils.h"
 
 #define IR_LED_PIN 3
 #define IR_RECEIVER_PIN 2
 
 IRsend irsend;
 IRrecv irrecv(IR_RECEIVER_PIN);
-
-decode_results results;
 
 void setup() {
   irsend.begin(IR_LED_PIN);
@@ -18,11 +17,12 @@ void setup() {
 }
 
 void loop() {
-    if (irrecv.decode(&results)) {
+    if (irrecv.decode()) {
         Serial.print("Received IR Data: 0x");
-        Serial.println(results.value, HEX);
+        uint32_t data = reverseBits(irrecv.decodedIRData.decodedRawData);
+        Serial.println(data, HEX);
 
-        irsend.sendNEC(results.value, 32);
+        irsend.sendNEC(data, 32);
 
         irrecv.resume();
     }

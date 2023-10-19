@@ -1,1 +1,3 @@
 .vscode
+**/utils.h
+!/utils.h
