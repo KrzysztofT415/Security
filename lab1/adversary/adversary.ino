@@ -10,10 +10,10 @@ IRsend irsend;
 IRrecv irrecv(IR_RECEIVER_PIN);
 
 void setup() {
-  irsend.begin(IR_LED_PIN);
-  irrecv.enableIRIn();
+    irsend.begin(IR_LED_PIN);
+    irrecv.enableIRIn();
 
-  Serial.begin(9600);
+    Serial.begin(9600);
 }
 
 void loop() {

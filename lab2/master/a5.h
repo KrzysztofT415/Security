@@ -16,7 +16,7 @@
 #define OUTPUT ((((uint64_t) 1 << 23) + 1 << 22) + 1 << 18)
 
 typedef bool bit_t;
-typedef unsigned char byte_t;
+typedef uint64_t A5register; 
 
 bit_t parity(uint64_t x) {
     for (int s = 1 << 5; s; s >>= 1) x ^= x >> s;
@@ -50,7 +50,9 @@ void clock(uint64_t* reg) {
 }
 
 void a5_key_setup(uint64_t* reg, uint64_t key, uint64_t frame) {
-	for (int i = 0; i < 64; i++) {
+	*reg = 0;
+
+    for (int i = 0; i < 64; i++) {
 		clockWhole(reg);
         if ((key >> i) & 1) *reg ^= INPUT;
 	}
@@ -63,17 +65,12 @@ void a5_key_setup(uint64_t* reg, uint64_t key, uint64_t frame) {
 	for (int i = 0; i < 100; i++) clock(reg);
 }
 
-void a5_key_gen(uint64_t* reg, byte_t* downlink, byte_t* uplink) {
-	for (int i = 0; i <= 113 / 8; i++) downlink[i] = uplink[i] = 0;
-
-	for (int i = 0; i < 114; i++) {
+uint32_t a5_key_gen(uint64_t* reg) {
+    uint32_t key = 0;
+	for (int i = 0; i < 32; i++) {
         clock(reg);
-        downlink[i / 8] |= getBit(reg) << (7 - (i & 7));
+        key |= static_cast<uint32_t>(getBit(reg)) << i;
     }
-
-	for (int i = 0; i < 114; i++) {
-        clock(reg);
-        uplink[i / 8] |= getBit(reg) << (7 - (i & 7));
-    }
+    return key;
 }
 
